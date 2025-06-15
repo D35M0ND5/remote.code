@@ -6,7 +6,6 @@ trap 'echo "Error on line $LINENO"; exit 1' ERR
 
 # Configuration variables
 USER_TARGET_DISK="nvme0n1"
-TARGET_DISK="/dev/${USER_TARGET_DISK}"
 IS_NVME="y"
 HOSTNAME="N3M1S1S"
 USERNAME="user"
@@ -18,6 +17,7 @@ PACKAGES="base linux linux-firmware networkmanager grub efibootmgr sudo git"
 get_user_input() {
     read -p "Is the drive nvme? ('y' or 'n'): " IS_NVME
     read -p "Enter target disk (e.g., nvme0n1): " USER_TARGET_DISK
+    TARGET_DISK="/dev/${USER_TARGET_DISK}"
     echo "Target disk $TARGET_DISK selected"
     read -p "Enter hostname: " HOSTNAME
     echo "HOSTNAME $HOSTNAME selected"
@@ -30,12 +30,8 @@ partition_disk() {
     
     # choose partition number scheme
     part_number=("p1" "p2" "p3")
-    if [[ "$IS_NVME" != "y" ]]; then
-        i=0
-        for nm in "${part_number[@]}"; do
-            i=$i+1
-            nm="$i" 
-        done
+    if [[ "$IS_NVME" == "n" ]]; then
+        part_number=("1" "2" "3")
     fi
 
     # Unmount any existing partitions (safety check)
@@ -126,6 +122,7 @@ partition_disk() {
 main() {
     # collect user input variables
     get_user_input
+    TARGET_DISK="/dev/${USER_TARGET_DISK}"
 
     # Verify boot mode
     if [[ ! -d /sys/firmware/efi ]]; then
