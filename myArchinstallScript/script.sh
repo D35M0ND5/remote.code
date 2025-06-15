@@ -52,19 +52,19 @@ partition_disk() {
     echo "Partitioning completed successfully."
 }
 
-install_base() {
-    # echo "Installing base system..."
-    # pacstrap /mnt $PACKAGES
+# install_base() {
+#     echo "Installing base system..."
+#     pacstrap /mnt $PACKAGES
     
-    # # Generate fstab
-    # genfstab -U /mnt >> /mnt/etc/fstab
+#     # Generate fstab
+#     genfstab -U /mnt >> /mnt/etc/fstab
     
-    # # Copy the install script to new system for stage 2
-    # cp "$0" /mnt/root/install.sh
-    # chmod +x /mnt/install.sh
-}
+#     # Copy the install script to new system for stage 2
+#     cp "$0" /mnt/root/install.sh
+#     chmod +x /mnt/install.sh
+# }
 
-configure_system() {
+# configure_system() {
 #     echo "Configuring system..."
 #     arch-chroot /mnt /bin/bash <<EOF
 #     # Set timezone
@@ -107,7 +107,7 @@ configure_system() {
 #     # Run stage 2 of installation
 #     /root/install.sh --stage2
 # EOF
-}
+# }
 
 
 main() {
@@ -120,16 +120,16 @@ main() {
         exit 1
     fi
     
-    # Update mirrorlist
-    echo "Updating mirrorlist..."
-    reflector --country UK --latest 10 --protocol https --sort rate --save /etc/pacman.d/mirrorlist
+    # # Update mirrorlist
+    # echo "Updating mirrorlist..."
+    # reflector --country UK --latest 10 --protocol https --sort rate --save /etc/pacman.d/mirrorlist
     
     partition_disk
-    install_base
-    configure_system
+    # install_base
+    # configure_system
     
     echo "Installation complete! Reboot your system."
-    umount -R /mnt
+    # umount -R /mnt
 }
 
 main "$@"
