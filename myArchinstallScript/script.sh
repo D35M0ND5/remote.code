@@ -20,7 +20,7 @@ get_user_input() {
     TARGET_DISK="/dev/${USER_TARGET_DISK}"
     echo "Target disk $TARGET_DISK selected"
     read -p "Enter hostname: " HOSTNAME
-    echo "HOSTNAME $HOSTNAME selected"
+    echo "hostname $HOSTNAME selected"
     read -p "Enter username: " USERNAME
     echo "username $TARGET_DISK selected"
 }
