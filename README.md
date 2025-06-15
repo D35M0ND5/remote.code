@@ -1,2 +1,2 @@
 # remote.code
-remote vs code playground
+remote vs code playground repo
