@@ -5,7 +5,9 @@ set -euo pipefail
 trap 'echo "Error on line $LINENO"; exit 1' ERR
 
 # Configuration variables
-TARGET_DISK="/dev/nvme0n1"
+USER_TARGET_DISK="nvme0n1"
+TARGET_DISK="/dev/${USER_TARGET_DISK}"
+IS_NVME="y"
 HOSTNAME="N3M1S1S"
 USERNAME="user"
 TIMEZONE="Africa/Accra"
@@ -14,7 +16,8 @@ KEYMAP="uk"
 PACKAGES="base linux linux-firmware networkmanager grub efibootmgr sudo git"
 
 get_user_input() {
-    read -p "Enter target disk (e.g., /dev/nvme0n1): " TARGET_DISK
+    read -p "Is the drive nvme? ('y' or 'n'): " IS_NVME
+    read -p "Enter target disk (e.g., nvme0n1): " USER_TARGET_DISK
     echo "Target disk $TARGET_DISK selected"
     read -p "Enter hostname: " HOSTNAME
     echo "HOSTNAME $HOSTNAME selected"
@@ -25,14 +28,24 @@ get_user_input() {
 partition_disk() {
     echo "Partitioning disk ..."
     
+    # choose partition number scheme
+    part_number=("p1" "p2" "p3")
+    if [[ "$IS_NVME" != "y" ]]; then
+        i=0
+        for nm in "${part_number[@]}"; do
+            i=$i+1
+            nm="$i" 
+        done
+    fi
+
     # Unmount any existing partitions (safety check)
     umount -R /mnt 2>/dev/null || true
     
     # Create GPT partition table
-    printf "g\n" | fdisk "$TARGET_DISK"
+    printf "g\nw" | fdisk "${TARGET_DISK}"
     
     # Create EFI partition (512MB)
-    printf "n\n1\n\n+512M\nt\n1\n" | fdisk "$TARGET_DISK"
+    printf "n\n1\n\n+512M\nt\n1\nw" | fdisk "$TARGET_DISK"
     
     # Create root partition (remaining space)
     printf "n\n2\n\n\nw\n" | fdisk "$TARGET_DISK"
@@ -41,13 +54,13 @@ partition_disk() {
     partprobe "$TARGET_DISK"
     
     # Format partitions
-    mkfs.fat -F32 "${TARGET_DISK}p1"
-    mkfs.ext4 -F "${TARGET_DISK}p2"
+    mkfs.fat -F32 "${TARGET_DISK}${part_number[0]}"
+    mkfs.ext4 -F "${TARGET_DISK}${part_number[1]}"
     
     # Mount partitions
-    mount "${TARGET_DISK}p2" /mnt
+    mount "${TARGET_DISK}${part_number[1]}" /mnt
     mkdir -p /mnt/boot
-    mount "${TARGET_DISK}p1" /mnt/boot
+    mount "${TARGET_DISK}${part_number[0]}" /mnt/boot
     
     echo "Partitioning completed successfully."
 }
