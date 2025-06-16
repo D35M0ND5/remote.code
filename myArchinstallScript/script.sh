@@ -12,7 +12,7 @@ USERNAME="user"
 TIMEZONE="Africa/Accra"
 LOCALE="en_UK.UTF-8"
 KEYMAP="uk"
-PACKAGES="base linux linux-firmware networkmanager grub efibootmgr sudo git nano base-devel"
+PACKAGES="base linux linux-firmware networkmanager grub efibootmgr sudo git nano base-devel fish"
 
 get_user_input() {
     read -p "Is the drive nvme? ('y' or 'n'): " IS_NVME
@@ -100,9 +100,13 @@ configure_system() {
     
     # Enable NetworkManager
     systemctl enable NetworkManager
+
+    # Root password
+    echo "Set root password: "
+    passwd
     
     # Create user
-    useradd -m -G wheel -s /bin/bash $USERNAME
+    useradd -m -G wheel -s /bin/fish $USERNAME
     echo "Set password for $USERNAME:"
     passwd $USERNAME
     
