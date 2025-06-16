@@ -94,13 +94,6 @@ configure_system() {
     # Set hostname
     echo "$HOSTNAME" > /etc/hostname
     
-    # Configure hosts file
-    cat > /etc/hosts <<HOSTS
-127.0.0.1   localhost
-::1         localhost
-127.0.1.1   $HOSTNAME.localdomain $HOSTNAME
-HOSTS
-    
     # Install bootloader
     grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB
     grub-mkconfig -o /boot/grub/grub.cfg
@@ -137,8 +130,8 @@ main() {
     # rankmirrors -n 6 /etc/pacman.d/mirrorlist.backup > /etc/pacman.d/mirrorlist
     
     partition_disk
-    # install_base
-    # configure_system
+    install_base
+    configure_system
     
     echo "Installation complete! Reboot your system."
     # umount -R /mnt
