@@ -40,23 +40,28 @@ partition_disk() {
     # Create GPT partition table
     printf "g\nw" | fdisk "${TARGET_DISK}"
     
-    # Create EFI partition (512MB)
+    # Create EFI partition
     printf "n\n1\n\n+512M\nt\n1\nw" | fdisk "$TARGET_DISK"
     
+    # Create Swap partition
+    printf "n\n2\n\n+4G\nt\nswap\nw" | fdisk "$TARGET_DISK"
+    
     # Create root partition (remaining space)
-    printf "n\n2\n\n\nw\n" | fdisk "$TARGET_DISK"
+    printf "n\n3\n\n\nw\n" | fdisk "$TARGET_DISK"
     
     # Inform kernel about partition changes
     partprobe "$TARGET_DISK"
     
     # Format partitions
     mkfs.fat -F32 "${TARGET_DISK}${part_number[0]}"
-    mkfs.ext4 -F "${TARGET_DISK}${part_number[1]}"
+    mkswap -F "${TARGET_DISK}${part_number[1]}"
+    mkfs.ext4 -F "${TARGET_DISK}${part_number[2]}"
     
     # Mount partitions
-    mount "${TARGET_DISK}${part_number[1]}" /mnt
-    mkdir -p /mnt/boot
-    mount "${TARGET_DISK}${part_number[0]}" /mnt/boot
+    mount "${TARGET_DISK}${part_number[2]}" /mnt
+    mkdir -p /mnt/boot/efi
+    mount "${TARGET_DISK}${part_number[0]}" /mnt/boot/efi
+    swapon "${TARGET_DISK}${part_number[1]}"
     
     echo "Partitioning completed successfully."
 }
