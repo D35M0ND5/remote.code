@@ -98,8 +98,9 @@ configure_system() {
     grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB
     grub-mkconfig -o /boot/grub/grub.cfg
     
-    # Enable NetworkManager
+    # Enable NetworkManager and Bluetooth
     systemctl enable NetworkManager
+    systemctl enable Bluetooth.service
 
     # Root password
     echo "Set root password: "
