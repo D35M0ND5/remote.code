@@ -34,28 +34,54 @@ partition_disk() {
         part_number=("1" "2" "3")
     fi
 
-    # Unmount any existing partitions (safety check)
-    umount -R /mnt 2>/dev/null || true
+    fdisk "$TARGET_DISK" <<EOF
+# Create new GPT table
+g
+# Create new EFI partition
+n
+
+
++512M
+t
+1
+# Create new Swap partition
+n
+
+
++4G
+t
+2
+swap
+# Create root partition
+n
+
+
+
+w
+EOF
+
+    # # Unmount any existing partitions (safety check)
+    # umount -R /mnt 2>/dev/null || true
     
-    # Create GPT partition table
-    printf "g\nw" | fdisk "${TARGET_DISK}"
+    # # Create GPT partition table
+    # printf "g\nw" | fdisk "${TARGET_DISK}"
     
-    # Create EFI partition
-    printf "n\n1\n\n+512M\nt\n1\nw" | fdisk "$TARGET_DISK"
+    # # Create EFI partition
+    # printf "n\n1\n\n+512M\nt\n1\nw" | fdisk "$TARGET_DISK"
     
-    # Create Swap partition
-    printf "n\n2\n\n+4G\nt\nswap\nw" | fdisk "$TARGET_DISK"
+    # # Create Swap partition
+    # printf "n\n2\n\n+4G\nt\nswap\nw" | fdisk "$TARGET_DISK"
     
-    # Create root partition (remaining space)
-    printf "n\n3\n\n\nw\n" | fdisk "$TARGET_DISK"
+    # # Create root partition (remaining space)
+    # printf "n\n3\n\n\nw\n" | fdisk "$TARGET_DISK"
     
     # Inform kernel about partition changes
     partprobe "$TARGET_DISK"
     
     # Format partitions
     mkfs.fat -F32 "${TARGET_DISK}${part_number[0]}"
-    mkswap -F "${TARGET_DISK}${part_number[1]}"
-    mkfs.ext4 -F "${TARGET_DISK}${part_number[2]}"
+    mkswap "${TARGET_DISK}${part_number[1]}"
+    mkfs.ext4 "${TARGET_DISK}${part_number[2]}"
     
     # Mount partitions
     mount "${TARGET_DISK}${part_number[2]}" /mnt
