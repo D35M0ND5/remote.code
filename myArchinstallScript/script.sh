@@ -9,6 +9,7 @@ USER_TARGET_DISK="nvme0n1"
 IS_NVME="y"
 HOSTNAME="N3M1S1S"
 USERNAME="user"
+PASSWRD=""
 TIMEZONE="Africa/Accra"
 LOCALE="en_UK.UTF-8"
 KEYMAP="uk"
@@ -126,16 +127,23 @@ configure_system() {
     
     # Enable NetworkManager and Bluetooth
     systemctl enable NetworkManager
-    systemctl enable Bluetooth.service
+    systemctl enable Bluetooth
 
     # Root password
-    echo "Set root password: "
-    passwd
+    read -p "Set root password: " PASSWRD
+    passwd <<EOF
+$PASSWRD
+$PASSWRD
+EOF
     
     # Create user
     useradd -m -G wheel -s /bin/fish $USERNAME
     echo "Set password for $USERNAME:"
-    passwd $USERNAME
+    read -p "Set password for $USERNAME:" PASSWRD
+    passwd $USERNAME <<EOF
+$PASSWRD
+$PASSWRD
+EOF
     
     # Configure sudo
     echo "%wheel ALL=(ALL) ALL" > /etc/sudoers.d/wheel
@@ -155,8 +163,8 @@ main() {
         exit 1
     fi
     
-    # # Update mirrorlist
-    # echo "Updating mirrorlist..."
+    # Update mirrorlist
+    echo "Updating mirrorlist..."
     reflector --latest 20 --protocol https --sort rate --save /etc/pacman.d/mirrorlist
     
     partition_disk
