@@ -22,7 +22,7 @@ get_user_input() {
     read -p "Enter hostname: " HOSTNAME
     echo "hostname $HOSTNAME selected"
     read -p "Enter username: " USERNAME
-    echo "username $TARGET_DISK selected"
+    echo "username $USERNAME selected"
 }
 
 partition_disk() {
@@ -131,8 +131,7 @@ main() {
     
     # # Update mirrorlist
     # echo "Updating mirrorlist..."
-    reflector --country Ghana --latest 20 --protocol https --sort rate --save /etc/pacman.d/mirrorlist
-    # rankmirrors -n 6 /etc/pacman.d/mirrorlist.backup > /etc/pacman.d/mirrorlist
+    reflector --latest 20 --protocol https --sort rate --save /etc/pacman.d/mirrorlist
     
     partition_disk
     install_base
