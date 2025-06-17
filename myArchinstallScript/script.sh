@@ -138,7 +138,6 @@ EOF
     
     # Create user
     useradd -m -G wheel -s /bin/fish $USERNAME
-    echo "Set password for $USERNAME:"
     read -p "Set password for $USERNAME:" PASSWRD
     passwd $USERNAME <<EOF
 $PASSWRD
