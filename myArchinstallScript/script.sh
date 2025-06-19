@@ -120,24 +120,24 @@ configure_system() {
     grub-mkconfig -o /boot/grub/grub.cfg
 
     systemctl enable NetworkManager                                                          # Enable NetworkManager and Bluetooth
+EOF
 
     read -p "Set root password: " PASSWRD                                                    # Root password
     passwd <<EOF
-    $PASSWRD
-    $PASSWRD
-    EOF
+$PASSWRD
+$PASSWRD
+EOF
     
     useradd -m -G wheel $USERNAME                                                           # Create user
     read -p "Set password for $USERNAME:" PASSWRD
     passwd $USERNAME <<EOF
-    $PASSWRD
-    $PASSWRD
-    EOF
+$PASSWRD
+$PASSWRD
+EOF
     
     chsh -s /bin/fish                                                                      # Set fish as shell
     
     echo "%wheel ALL=(ALL) ALL" > /etc/sudoers.d/wheel                                     # Configure sudo
-EOF
 }
 
 
