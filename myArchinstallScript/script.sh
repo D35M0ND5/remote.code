@@ -127,18 +127,16 @@ configure_system() {
     $PASSWRD
     EOF
     
-    useradd -m -G wheel $USERNAME# Create user
+    useradd -m -G wheel $USERNAME                                                           # Create user
     read -p "Set password for $USERNAME:" PASSWRD
     passwd $USERNAME <<EOF
     $PASSWRD
     $PASSWRD
     EOF
     
-    #Set fish as shell
-    chsh -s /bin/fish
-
-    # Configure sudo
-    echo "%wheel ALL=(ALL) ALL" > /etc/sudoers.d/wheel
+    chsh -s /bin/fish                                                                      # Set fish as shell
+    
+    echo "%wheel ALL=(ALL) ALL" > /etc/sudoers.d/wheel                                     # Configure sudo
 EOF
 }
 
