@@ -127,7 +127,6 @@ configure_system() {
     
     # Enable NetworkManager and Bluetooth
     systemctl enable NetworkManager
-    systemctl enable Bluetooth
 
     # Root password
     read -p "Set root password: " PASSWRD
@@ -137,16 +136,18 @@ $PASSWRD
 EOF
     
     # Create user
-    useradd -m -G wheel -s /bin/fish $USERNAME
+    useradd -m -G wheel $USERNAME
     read -p "Set password for $USERNAME:" PASSWRD
     passwd $USERNAME <<EOF
 $PASSWRD
 $PASSWRD
 EOF
     
+    #Set fish as shell
+    chsh -s /bin/fish
+    
     # Configure sudo
     echo "%wheel ALL=(ALL) ALL" > /etc/sudoers.d/wheel
-    
 EOF
 }
 
