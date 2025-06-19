@@ -20,10 +20,10 @@ get_user_input() {
     read -p "Enter target disk (e.g., nvme0n1): " USER_TARGET_DISK
     TARGET_DISK="/dev/${USER_TARGET_DISK}"
     echo "Target disk $TARGET_DISK selected"
+    echo "Warning! stuff's gonna get cleared off $TARGET_DISK!! Check again!"
+    echo " "
     read -p "Enter hostname: " HOSTNAME
-    echo "hostname $HOSTNAME selected"
     read -p "Enter username: " USERNAME
-    echo "username $USERNAME selected"
 }
 
 partition_disk() {
@@ -175,6 +175,7 @@ main() {
     echo "------------------------------------------"
     echo " "
     echo "Updating mirrorlist..."
+    echo " "
     reflector --latest 20 --protocol https --sort rate --save /etc/pacman.d/mirrorlist
     
     partition_disk
