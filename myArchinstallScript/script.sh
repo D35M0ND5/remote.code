@@ -27,7 +27,11 @@ get_user_input() {
 }
 
 partition_disk() {
+    echo " "
+    echo "------------------------------------------"
+    echo " "
     echo "Partitioning disk ..."
+    echo " "
     
     # choose partition number scheme
     part_number=("p1" "p2" "p3")
@@ -94,16 +98,27 @@ EOF
 }
 
 install_base() {
+    echo " "
+    echo "------------------------------------------"
+    echo " "
     echo "Installing base system..."
+    echo " "
     pacstrap -K /mnt $PACKAGES
     
     # Generate fstab
+    echo " "
+    echo "------------------------------------------"
+    echo " "
     genfstab -U /mnt >> /mnt/etc/fstab
     
 }
 
 configure_system() {
+    echo " "
+    echo "------------------------------------------"
+    echo " "
     echo "Configuring system..."
+    echo " "
     arch-chroot /mnt /bin/bash <<EOF
     ln -sf /usr/share/zoneinfo/$TIMEZONE /etc/localtime                                       # Set timezone
     hwclock --systohc
@@ -122,22 +137,25 @@ configure_system() {
     systemctl enable NetworkManager                                                          # Enable NetworkManager and Bluetooth
 EOF
 
-    read -p "Set root password: " PASSWRD                                                    # Root password
-    passwd <<EOF
-$PASSWRD
-$PASSWRD
-EOF
-    
+    echo " "
+    echo "------------------------------------------"
+    echo " "
+    echo "Set new root password..."                                                            # Root password
+    passwd
+
     useradd -m -G wheel $USERNAME                                                           # Create user
-    read -p "Set password for $USERNAME:" PASSWRD
-    passwd $USERNAME <<EOF
-$PASSWRD
-$PASSWRD
-EOF
-    
-    chsh -s /bin/fish                                                                      # Set fish as shell
-    
+    echo " "
+    echo "Set user password..."
+    passwd $USERNAME
+
+    echo " "
+    echo "------------------------------------------"
+    echo " "
     echo "%wheel ALL=(ALL) ALL" > /etc/sudoers.d/wheel                                     # Configure sudo
+    
+    echo " "
+    su $USERNAME
+    chsh -s /bin/fish                                                                      # Set fish as shell
 }
 
 
@@ -153,6 +171,9 @@ main() {
     fi
     
     # Update mirrorlist
+    echo " "
+    echo "------------------------------------------"
+    echo " "
     echo "Updating mirrorlist..."
     reflector --latest 20 --protocol https --sort rate --save /etc/pacman.d/mirrorlist
     
@@ -160,6 +181,9 @@ main() {
     install_base
     configure_system
     
+    echo " "
+    echo "------------------------------------------"
+    echo " "
     echo "Installation complete! Reboot your system."
     # umount -R /mnt
 }
