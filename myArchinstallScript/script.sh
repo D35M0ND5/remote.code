@@ -105,47 +105,38 @@ install_base() {
 configure_system() {
     echo "Configuring system..."
     arch-chroot /mnt /bin/bash <<EOF
-
-    # Set timezone
-    ln -sf /usr/share/zoneinfo/$TIMEZONE /etc/localtime
+    ln -sf /usr/share/zoneinfo/$TIMEZONE /etc/localtime                                       # Set timezone
     hwclock --systohc
-    
-    # Set locale
-    sed -i "s/#$LOCALE/$LOCALE/" /etc/locale.gen
+
+    sed -i "s/#$LOCALE/$LOCALE/" /etc/locale.gen                                              # Set locale
     locale-gen
     echo "LANG=$LOCALE" > /etc/locale.conf
-    
-    # Set keymap
-    echo "KEYMAP=$KEYMAP" > /etc/vconsole.conf
-    
-    # Set hostname
-    echo "$HOSTNAME" > /etc/hostname
-    
-    # Install bootloader
-    grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB
-    grub-mkconfig -o /boot/grub/grub.cfg
-    
-    # Enable NetworkManager and Bluetooth
-    systemctl enable NetworkManager
 
-    # Root password
-    read -p "Set root password: " PASSWRD
+    echo "KEYMAP=$KEYMAP" > /etc/vconsole.conf                                                # Set keymap
+
+    echo "$HOSTNAME" > /etc/hostname# Set hostname
+
+    grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB          # Install bootloader
+    grub-mkconfig -o /boot/grub/grub.cfg
+
+    systemctl enable NetworkManager                                                          # Enable NetworkManager and Bluetooth
+
+    read -p "Set root password: " PASSWRD                                                    # Root password
     passwd <<EOF
-$PASSWRD
-$PASSWRD
-EOF
+    $PASSWRD
+    $PASSWRD
+    EOF
     
-    # Create user
-    useradd -m -G wheel $USERNAME
+    useradd -m -G wheel $USERNAME# Create user
     read -p "Set password for $USERNAME:" PASSWRD
     passwd $USERNAME <<EOF
-$PASSWRD
-$PASSWRD
-EOF
+    $PASSWRD
+    $PASSWRD
+    EOF
     
     #Set fish as shell
     chsh -s /bin/fish
-    
+
     # Configure sudo
     echo "%wheel ALL=(ALL) ALL" > /etc/sudoers.d/wheel
 EOF
